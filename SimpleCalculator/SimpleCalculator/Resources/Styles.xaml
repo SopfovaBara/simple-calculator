@@ -1,0 +1,115 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    
+    <!-- BUTTONS -->
+
+    <Style TargetType="Button" x:Key="ButtonBaseStyle" >
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultFontBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultStrokeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DefaultButtonBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource MouseOverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button" x:Key="NumButtonStyle" 
+           BasedOn="{StaticResource ButtonBaseStyle}">
+        <Setter Property="Background" Value="{DynamicResource NumButtonBrush}" />
+    </Style>
+
+    <Style TargetType="Button" x:Key="EqualsButtonStyle" 
+           BasedOn="{StaticResource ButtonBaseStyle}">
+        <Setter Property="Background" Value="{DynamicResource EqualsButtonBrush}" />
+    </Style>
+
+    <Style TargetType="Button" x:Key="DisplayButtonStyle" 
+           BasedOn="{StaticResource ButtonBaseStyle}">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{DynamicResource DisplayButtonBrush}" />
+    </Style>
+
+
+    <!-- BORDERS -->
+
+    <Style TargetType="Border" x:Key="DisplayBorderStyle">
+        <Setter Property="BorderThickness" Value="2,2,2,1" />
+        <Setter Property="Padding" Value="10, 15" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultStrokeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DisplayBorderBrush}" />
+    </Style>
+
+    <Style TargetType="Border" x:Key="HistoryBorderStyle">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="0,2,0,0" />
+        <Setter Property="Padding" Value="5, 5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultStrokeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DisplayBorderBrush}" />
+    </Style>
+
+    
+    <!-- TEXT BLOCKS -->
+
+    <Style TargetType="TextBlock" x:Key="DisplayTextStyle">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="Margin" Value="10,5,0,0" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultFontBrush}" />
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="HistoryTextStyle">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Margin" Value="10,1" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultFontBrush}" />
+    </Style>
+
+    
+    <!-- LIST BOX -->
+
+    <Style TargetType="ListBox" x:Key="HistoryListStyle">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="{DynamicResource DisplayBorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultStrokeBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultFontBrush}" />
+    </Style>
+
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Background" Value="{DynamicResource DisplayBorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DisplayBorderBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2">
+                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource MouseOverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

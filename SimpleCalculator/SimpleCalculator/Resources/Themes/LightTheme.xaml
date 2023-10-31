@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- BRUSHES -->
+
+    <Brush x:Key="DefaultFontBrush">#404040</Brush>
+    <Brush x:Key="DefaultStrokeBrush">#555555</Brush>
+    <Brush x:Key="DefaultButtonBrush">#e7e7e7</Brush>
+    <Brush x:Key="NumButtonBrush">#e0e0e0</Brush>
+    <Brush x:Key="EqualsButtonBrush">#f0f0f0</Brush>
+    <Brush x:Key="DisplayButtonBrush">#e7e7e7</Brush>
+    <Brush x:Key="DisplayBorderBrush">#f0f0f0</Brush>
+    <Brush x:Key="MouseOverBrush">#808590</Brush>
+
+</ResourceDictionary>
