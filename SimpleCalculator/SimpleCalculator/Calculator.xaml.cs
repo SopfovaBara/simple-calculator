@@ -17,6 +17,8 @@ namespace SimpleCalculator
             new TokenEntity("0", TokenTypes.None)
         };
         private double ans = 0;
+        private bool error = false;
+
         public List<RecordEntity> historyList { get; set; } 
             = new List<RecordEntity>();
 
@@ -55,8 +57,17 @@ namespace SimpleCalculator
             if (tokens[LastToken()].Type == TokenTypes.Ans)
             {
                 var topTextBlock = (TextBlock)this.FindName("Top_TextBlock");
-                topTextBlock.Text = ans.ToString();
+                topTextBlock.Text = tokens[LastToken()].Content;
                 tokens[LastToken()].Type = TokenTypes.None;
+
+                if (tokens[LastToken()].Content == "ERROR")
+                {
+                    var bottomTextBlock = (TextBlock)this.FindName("Bottom_TextBlock");
+
+                    bottomTextBlock.Text = "0";
+                    tokens[LastToken()].Content = "0";
+                    error = false;
+                }
             }
         }
         private void Backspace(int count)
@@ -100,20 +111,13 @@ namespace SimpleCalculator
             bottomTextBlock.Text += content;
         }
 
-        private bool CheckDot()
+        private void CheckDecimal()
         {
             if (tokens[LastToken()].Type == TokenTypes.Decimal
                 && tokens[LastToken()].Content[LastChar(LastToken())] == ',')
             {
-                Backspace(1);
-                tokens[LastToken()].Content =
-                    tokens[LastToken()].Content.Remove(LastChar(LastToken()));
-                tokens[LastToken()].Type = TokenTypes.Number;
-
-                return false;
+                tokens[LastToken()].Content += "0";
             }
-
-            return true;
         }
 
         private void Num_Button_Click(object sender, RoutedEventArgs e)
@@ -200,7 +204,7 @@ namespace SimpleCalculator
             }
             else if (tokens[LastToken()].Type != TokenTypes.OpenPar)
             {
-                CheckDot();
+                CheckDecimal();
                 CreateNewToken(op, TokenTypes.Operator);
             }
         }
@@ -217,7 +221,7 @@ namespace SimpleCalculator
                 || tokens[LastToken()].Type == TokenTypes.Decimal
                 || tokens[LastToken()].Type == TokenTypes.ClosePar)
             {
-                CheckDot();
+                CheckDecimal();
                 CreateNewToken("×", TokenTypes.Operator);
             }
             else
@@ -254,7 +258,7 @@ namespace SimpleCalculator
                 if (tokens[LastToken()].Type != TokenTypes.Operator
                     && tokens[LastToken()].Type != TokenTypes.OpenPar)
                 {
-                    CheckDot();
+                    CheckDecimal();
                     CreateNewToken("×", TokenTypes.Operator);
                 }
 
@@ -281,7 +285,7 @@ namespace SimpleCalculator
                     || tokens[LastToken()].Type == TokenTypes.Decimal
                     || tokens[LastToken()].Type == TokenTypes.ClosePar)
                 {
-                    CheckDot();
+                    CheckDecimal();
                     CreateNewToken(")", TokenTypes.ClosePar);
                 }
             }
@@ -289,7 +293,15 @@ namespace SimpleCalculator
 
         private double Pwr(double a, double b) { return Math.Pow(a, b); }
         private double Mod(double a, double b) { return a % b; }
-        private double Div(double a, double b) { return a / b; }
+        private double Div(double a, double b) 
+        { 
+            if (b == 0)
+            {
+                error = true;
+                return 0;
+            }
+            return a / b; 
+        }
         private double Mul(double a, double b) { return a * b; }
         private double Sub(double a, double b) { return a - b; }
         private double Add(double a, double b) { return a + b; }
@@ -318,6 +330,13 @@ namespace SimpleCalculator
             while ((index = tokens.FindIndex(start, end - start + 1, token => token.Content.Equals("√"))) != -1)
             {
                 a = double.Parse(tokens[index + 1].Content);
+
+                if (a < 0)
+                {
+                    error = true;
+                    return;
+                }
+
                 c = Math.Sqrt(a);
 
                 tokens[index].Content = c.ToString();
@@ -338,6 +357,11 @@ namespace SimpleCalculator
                     a = double.Parse(tokens[index - 1].Content);
                     b = double.Parse(tokens[index + 1].Content);
                     c = fcs[i](a, b);
+
+                    if (error)
+                    {
+                        return;
+                    }
 
                     tokens[index - 1].Content = c.ToString();
                     tokens[index - 1].Type = (c % 1 == 0)
@@ -384,55 +408,50 @@ namespace SimpleCalculator
             List<TokenEntity> open = tokens.FindAll(token => token.Content.Equals("("));
             List<TokenEntity> close = tokens.FindAll(token => token.Content.Equals(")"));
 
-            if (open.Count > close.Count)
-            {
-                for (int i = 0; i < open.Count - close.Count; i++)
-                {
-                    CreateNewToken(")", TokenTypes.ClosePar);
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool CheckOperator()
-        {
-            if (tokens[LastToken()].Type == TokenTypes.Operator)
-            {
-                Backspace(1);
-                tokens.RemoveAt(LastToken());
-
-                return false;
-            }
-
-            return true;
+            return open.Count == close.Count;
         }
 
         private void Equals_Button_Click(object sender, RoutedEventArgs e)
         {
             var topTextBlock = (TextBlock)this.FindName("Top_TextBlock");
             var bottomTextBlock = (TextBlock)this.FindName("Bottom_TextBlock");
+            var historyListBox = (ListBox)this.FindName("History_ListBox");
 
 
-            if (CheckDot() && CheckOperator() && CheckParentheses())
+            CheckDecimal();
+
+            if (!CheckParentheses() || tokens[LastToken()].Type == TokenTypes.Operator)
             {
-                var historyListBox = (ListBox)this.FindName("History_ListBox");
-
-                FindParentheses(0);
-                DoMath(0, tokens.Count - 1);
-                ans = double.Parse(tokens[0].Content);
-
-                topTextBlock.Text = bottomTextBlock.Text;
-                topTextBlock.Text += " =";
-
-                bottomTextBlock.Text = tokens[0].Content;
-                tokens[0].Type = TokenTypes.Ans;
-
-                historyList.Add(new RecordEntity { Content = topTextBlock.Text, Ans = ans });
-                historyListBox.Items.Refresh();
+                topTextBlock.Text = "SYNTAX ERROR";
+                return;
             }
+
+            FindParentheses(0);
+            DoMath(0, tokens.Count - 1);
+
+            topTextBlock.Text = bottomTextBlock.Text;
+            topTextBlock.Text += " =";
+
+            if (error)
+            {
+                ans = 0;
+                bottomTextBlock.Text = "ERROR";
+
+                tokens = new List<TokenEntity>
+                {
+                    new TokenEntity("ERROR", TokenTypes.Ans)
+                };
+
+                return;
+            }
+
+            ans = double.Parse(tokens[0].Content);
+
+            bottomTextBlock.Text = tokens[0].Content;
+            tokens[0].Type = TokenTypes.Ans;
+
+            historyList.Add(new RecordEntity { Content = topTextBlock.Text, Ans = ans });
+            historyListBox.Items.Refresh();
         }
 
         private void Clear_Button_Click(object sender, RoutedEventArgs e)
@@ -453,12 +472,19 @@ namespace SimpleCalculator
         {
             var bottomTextBlock = (TextBlock)this.FindName("Bottom_TextBlock");
 
+
             if (bottomTextBlock.Text.Length == 1)
             {
                 ReplaceLastToken("0", TokenTypes.None);
             }
-            else if (CheckDot())
+            else
             {
+                if (tokens[LastToken()].Type == TokenTypes.Decimal
+                    && tokens[LastToken()].Content[LastChar(LastToken())] == ',')
+                {
+                    tokens[LastToken()].Type = TokenTypes.Number;
+                }
+
                 if (tokens[LastToken()].Content.Length == 1)
                 {
                     tokens.RemoveAt(LastToken());
